@@ -268,7 +268,8 @@ class Geocoder:
         if self.__run_async:
             raise TypeError("`async with` must be used with async adapters")
         res = self.adapter.__enter__()
-        assert res is self.adapter, "adapter's __enter__ must return `self`"
+        if res is not self.adapter:
+            raise TypeError("adapter's __enter__ must return `self`")
         return self
 
     def __exit__(self, exc_type, exc_val, exc_tb):
@@ -285,7 +286,8 @@ class Geocoder:
         if not self.__run_async:
             raise TypeError("`async with` cannot be used with sync adapters")
         res = await self.adapter.__aenter__()
-        assert res is self.adapter, "adapter's __enter__ must return `self`"
+        if res is not self.adapter:
+            raise TypeError("adapter's __aenter__ must return `self`")
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -455,7 +457,8 @@ def _synchronized(func):
             async_lock = asyncio.Lock()
 
         if async_lock.locked():
-            assert async_lock_task is not None
+            if async_lock_task is None:
+                raise AssertionError("async_lock_task should not be None when async_lock is locked")
             if compat.current_task() is async_lock_task:
                 res = func(self, *args, **kwargs)
                 if inspect.isawaitable(res):

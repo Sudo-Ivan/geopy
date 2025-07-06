@@ -83,7 +83,8 @@ class BaseRateLimiter:
         self.max_retries = max_retries
         self.swallow_exceptions = swallow_exceptions
         self.return_value_on_exception = return_value_on_exception
-        assert max_retries >= 0
+        if not max_retries >= 0:
+            raise ValueError("max_retries must be >= 0")
 
         # State:
         self._lock = threading.Lock()
@@ -255,8 +256,10 @@ class RateLimiter(BaseRateLimiter):
         )
         self.func = func
         self.error_wait_seconds = error_wait_seconds
-        assert error_wait_seconds >= min_delay_seconds
-        assert max_retries >= 0
+        if not error_wait_seconds >= min_delay_seconds:
+            raise ValueError("error_wait_seconds must be >= min_delay_seconds")
+        if not max_retries >= 0:
+            raise ValueError("max_retries must be >= 0")
 
     def _sleep(self, seconds):  # pragma: no cover
         logger.debug(type(self).__name__ + " sleep(%r)", seconds)
@@ -378,8 +381,10 @@ class AsyncRateLimiter(BaseRateLimiter):
         )
         self.func = func
         self.error_wait_seconds = error_wait_seconds
-        assert error_wait_seconds >= min_delay_seconds
-        assert max_retries >= 0
+        if not error_wait_seconds >= min_delay_seconds:
+            raise ValueError("error_wait_seconds must be >= min_delay_seconds")
+        if not max_retries >= 0:
+            raise ValueError("max_retries must be >= 0")
 
     async def _sleep(self, seconds):  # pragma: no cover
         logger.debug(type(self).__name__ + " sleep(%r)", seconds)

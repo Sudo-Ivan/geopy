@@ -1,5 +1,4 @@
 import warnings
-import xml.etree.ElementTree as ET
 from functools import partial
 from urllib.parse import urlencode
 
@@ -7,6 +6,12 @@ from geopy.exc import GeocoderQueryError
 from geopy.geocoders.base import DEFAULT_SENTINEL, Geocoder
 from geopy.location import Location
 from geopy.util import logger
+
+try:
+    import defusedxml.ElementTree as ET
+    defusedxml_available = True
+except ImportError:
+    defusedxml_available = False
 
 __all__ = ("IGNFrance", )
 
@@ -327,6 +332,13 @@ class IGNFrance(Geocoder):
         Returns location, (latitude, longitude) from XML feed
         and transform to json
         """
+        if not defusedxml_available:
+            raise ImportError(
+                "`defusedxml` must be installed in order to use IGNFrance. "
+                "If you have installed geopy via pip, you may use "
+                "this command to install defusedxml: "
+                '`pip install "geopy[defusedxml]"`.'
+            )
         # Parse the page
         tree = ET.fromstring(page.encode('utf-8'))
 

@@ -268,7 +268,7 @@ class Baidu(Geocoder):
         else:
             # http://lbsyun.baidu.com/index.php?title=lbscloud/api/appendix
             raw = "%s?%s%s" % (path, query_string, self.security_key)
-            sn = hashlib.md5(quote_plus(raw).encode('utf-8')).hexdigest()
+            sn = hashlib.sha256(quote_plus(raw).encode('utf-8')).hexdigest()
             return "%s?%s&sn=%s" % (url, query_string, sn)
 
 

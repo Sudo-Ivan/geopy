@@ -293,7 +293,13 @@ class URLLibAdapter(BaseSyncAdapter):
             )
 
     def get_text(self, url, *, timeout, headers):
-        req = Request(url=url, headers=headers)
+        parsed_url = urlparse(url)
+        if parsed_url.scheme not in ("http", "https"):
+            raise GeocoderServiceError(
+                "Unsupported URL scheme: %s. Only 'http' and 'https' are allowed."
+                % parsed_url.scheme
+            )
+        req = Request(url=url, headers=headers)  # noqa: S310
         try:
             page = self.urlopen(req, timeout=timeout)
         except Exception as error:
